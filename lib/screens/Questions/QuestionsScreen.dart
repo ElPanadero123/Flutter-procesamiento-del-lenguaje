@@ -4,7 +4,7 @@ import 'package:natural_languaje_processing_mobile/models/user.dart';
 class QuestionsScreen extends StatelessWidget {
   final UserNLP user;
 
-  const QuestionsScreen({super.key, required this.user});
+  const QuestionsScreen({Key? key, required this.user}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class QuestionsScreen extends StatelessWidget {
             textAlign: TextAlign.end,
             text: const TextSpan(
               style: TextStyle(
-                color: Colors.black,
+                color: Colors.white, // Blanco (invertido)
                 fontWeight: FontWeight.bold,
                 fontSize: 20.0,
               ),
@@ -27,31 +27,11 @@ class QuestionsScreen extends StatelessWidget {
               ],
             ),
           ),
-          flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color.fromARGB(255, 158, 0, 68), // Rojo oscuro
-                  Colors.white, // Blanco
-                ],
-              ),
-            ),
-          ),
+          backgroundColor: Color(0xFF9E0044), // Rojo oscuro (invertido)
         ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color.fromARGB(255, 158, 0, 68), // Rojo oscuro
-              Colors.white, // Blanco
-            ],
-          ),
-        ),
+        color: Colors.white, // Blanco (invertido)
         child: Column(
           children: [
             Expanded(
@@ -80,17 +60,43 @@ class QuestionsList extends StatelessWidget {
     return ListView.builder(
       itemCount: questions.length,
       itemBuilder: (context, index) {
-        return ListTile(
-          title: Text(
-            questions[index],
-            style: const TextStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
+        return BubbleMessage(
+          message: questions[index],
         );
       },
+    );
+  }
+}
+
+class BubbleMessage extends StatelessWidget {
+  final String message;
+
+  const BubbleMessage({Key? key, required this.message}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Color(0xFF9E0044), // Rojo oscuro (invertido)
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(20),
+            topLeft: Radius.circular(20),
+            bottomLeft: Radius.circular(20),
+          ),
+        ),
+        child: Text(
+          message,
+          style: const TextStyle(
+            fontSize: 18.0,
+            fontWeight: FontWeight.bold,
+            color: Colors.white, // Blanco (invertido)
+          ),
+        ),
+      ),
     );
   }
 }
