@@ -11,4 +11,9 @@ class LoadFormEvent extends LoginEvent {
   LoadFormEvent(this.type);
 }
 
-class ResetEvent extends LoginEvent{}
+class CurrentLoginEvent extends LoginEvent {
+  String id;
+  CurrentLoginEvent({required this.id});
+}
+
+class ResetEvent extends LoginEvent {}

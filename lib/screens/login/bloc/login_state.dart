@@ -20,4 +20,9 @@ class HandleFormState extends LoginState {
   HandleFormState({this.type = FormType.Login});
 }
 
-class ResetState extends LoginState{}
+class CurrentLoginState extends LoginState {
+  UserNLP user;
+  CurrentLoginState({required this.user});
+}
+
+class ResetState extends LoginState {}

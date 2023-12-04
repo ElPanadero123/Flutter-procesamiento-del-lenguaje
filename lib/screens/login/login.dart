@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,7 +35,7 @@ class _Login extends State<Login> {
           borderRadius: BorderRadius.circular(10.0),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.blue, width: 1.0),
+          borderSide: const BorderSide(color: Color(0xFF9e0044), width: 1.0),
           borderRadius: BorderRadius.circular(10.0),
         ),
         isCollapsed: true,
@@ -50,7 +51,14 @@ class _Login extends State<Login> {
           child: BlocBuilder<LoginBloc, LoginState>(builder: (context, state) {
             switch (state.runtimeType) {
               case InitState:
-                return _form(type: currentFormType);
+                if (FirebaseAuth.instance.currentUser != null) {
+                  String id = FirebaseAuth.instance.currentUser!.uid;
+                  BlocProvider.of<LoginBloc>(context)
+                      .add(CurrentLoginEvent(id: id));
+                } else {
+                  return _form(type: currentFormType);
+                }
+                return const CircularProgressIndicator(color: Color(0xFF9e0044),);
               case LoginSuccessState:
                 UserNLP user = (state as LoginSuccessState).user;
                 SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -60,7 +68,16 @@ class _Login extends State<Login> {
                       method: MethodNavigate.replace);
                 });
                 BlocProvider.of<LoginBloc>(context).add(ResetEvent());
-                return const CircularProgressIndicator();
+                return const CircularProgressIndicator(color: Color(0xFF9e0044),);
+              case CurrentLoginState:
+                UserNLP user = (state as CurrentLoginState).user;
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  navigate(
+                      context: context,
+                      screen: Home(user: user),
+                      method: MethodNavigate.replace);
+                });
+                return const CircularProgressIndicator(color: Color(0xFF9e0044),);
               case HandleFormState:
                 FormType type = (state as HandleFormState).type;
                 return _form(type: type);
@@ -77,7 +94,7 @@ class _Login extends State<Login> {
                 });
                 return _form(type: currentFormType);
               default:
-                return const CircularProgressIndicator();
+                return const CircularProgressIndicator(color: Color(0xFF9e0044),);
             }
           })),
     );
@@ -91,11 +108,35 @@ class _Login extends State<Login> {
         : "¿Ya tienes una cuenta? | Iniciar Sesion";
     String textButton = isLogin ? "Iniciar Sesion" : "Crear Cuenta";
     FormType handleFormType = isLogin ? FormType.Register : FormType.Login;
+
     final form = Container(
       alignment: Alignment.center,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Encabezado con las palabras "UNIVALLE" y "SANTA CRUZ"
+          const Padding(
+            padding: EdgeInsets.only(bottom: 32.0),
+            child: Column(
+              children: [
+                Text(
+                  "UNIVALLE",
+                  style: TextStyle(
+                    fontSize: 48.0, // Aumentado el tamaño
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF9e0044), // Color principal
+                  ),
+                ),
+                Text(
+                  "SANTA CRUZ",
+                  style: TextStyle(
+                    fontSize: 18.0, // Aumentado el tamaño
+                    color: Color(0xFF483c46), // Color secundario
+                  ),
+                ),
+              ],
+            ),
+          ),
           (type == FormType.Login)
               ? LoginForm(
                   keyForm: _formKey,
@@ -121,13 +162,14 @@ class _Login extends State<Login> {
                         .add(LoadFormEvent(handleFormType));
                   },
                   child: Text((message.split("|")[1]).trim(),
-                      style: const TextStyle(color: Colors.blue)),
+                      style: const TextStyle(color: Color(0xFF9e0044))),
                 )
               ],
             ),
           ),
+          // Cambiado el color del botón
           MaterialButton(
-            color: Colors.blue,
+            color: const Color(0xFF9e0044), // Cambiado el color
             textColor: Colors.white,
             onPressed: () => _submitForm(currentFormType),
             child: Text(textButton),

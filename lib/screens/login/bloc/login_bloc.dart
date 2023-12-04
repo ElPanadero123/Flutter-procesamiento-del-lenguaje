@@ -13,6 +13,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LogInEvent>(onLogInEvent);
     on<CreateAccountEvent>(onCreateAccountEvent);
     on<LoadFormEvent>(onLoadFormEvent);
+    on<CurrentLoginEvent>(onCurrentLoginEvent);
     on<ResetEvent>(onResetEvent);
   }
 
@@ -21,14 +22,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       final firebase = FirebaseClient("users");
       final Login = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: user.email, password: user.password);
-
       String id = Login.user!.uid;
       final data = await firebase.getDocById(id: id);
       UserNLP userLogin = UserNLP.fromMap(data as Map<String, dynamic>);
       emit(LoginSuccessState(user: userLogin));
     } on FirebaseAuthException {
-      emit(LoginErrorState(
-          'Las crendenciales de acceso no son válidas.'));
+      emit(LoginErrorState('Las crendenciales de acceso no son válidas.'));
     }
   }
 
@@ -65,5 +64,18 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   void onResetEvent(ResetEvent event, Emitter<LoginState> emit) {
     emit(ResetState());
+  }
+
+  void onCurrentLoginEvent(
+      CurrentLoginEvent event, Emitter<LoginState> emit) async {
+    String currentId = event.id;
+    try {
+      final firebase = FirebaseClient("users");
+      final data = await firebase.getDocById(id: currentId);
+      UserNLP currentUser = UserNLP.fromMap(data as Map<String, dynamic>);
+      emit(LoginSuccessState(user: currentUser));
+    } catch (e) {
+      emit(LoginErrorState((e).toString()));
+    }
   }
 }
